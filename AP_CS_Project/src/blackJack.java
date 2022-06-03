@@ -11,9 +11,8 @@
 import java.util.ArrayList; // import the ArrayList class
 public class blackJack extends javax.swing.JFrame {
 
-    /**
-     * Creates new form blackJack
-     */
+    
+    
     public blackJack() {
         initComponents();
     }

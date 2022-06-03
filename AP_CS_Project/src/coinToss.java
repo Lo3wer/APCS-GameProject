@@ -1,45 +1,89 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.ArrayList;
 
-/**
- *
- * @author lucas
- */
 public class coinToss extends javax.swing.JFrame {
-
-    /**
-     * Creates new form coinToss
-     */
+    
+    int points = updateNote.selected.getPoints(); // this needs to be connected to the notepad file and will be updated after existing the game
+    int betPoints = 0;
+    int side = 0;
+    int streak = 0;
+    int topStreak = 0; // this requires to grab from the notepad file the topStreak Score from the list
+    String topUser = ""; // as wel as this part
+    ArrayList<String> words = new ArrayList();
+    int[] score; 
+    
     public coinToss() {
         initComponents();
         buttonHead.setEnabled(false);
         buttonTail.setEnabled(false);
-        
+        buttonBet.setEnabled(false);
+        textPoints.setText(points+"");
+  
     }
-    int points = 0; // this needs to be connected to the notepad file and will be updated after existing the game
-    int side = -1;
-    int streak = 0;
-    int topStreak = 0; // this requires to grab from the notepad file the topStreak Score from the list
-    String topUser = ""; // as wel as this part
     
+    
+    public void loadWords() {
+        String currentDirectory = System.getProperty("user.dir");
+        String fullFileName = currentDirectory + "/coin.txt";
+        System.out.println("The file path is " + fullFileName);
+        words.clear();
+        try {   
+                FileReader fr = new FileReader(fullFileName);
+                BufferedReader br = new BufferedReader(fr);
+                String line="";
+                while( (line = br.readLine()) != null) {
+                    System.out.println("Just read: " + line);
+                    words.add(line);
+                }
+                br.close();
+        }
+        catch(Exception e) {
+                System.out.println("Something went wrong file reading!");
+        }
+    }
+    public void updateNotePad(){
+        String currentDirectory = System.getProperty("user.dir");
+        String fullFileName = currentDirectory + "/coin.txt";
+        
+        try {
+            FileWriter fw = new FileWriter(fullFileName);
+            BufferedWriter br = new BufferedWriter(fw);
+           
+            for(int k =0; k<words.size(); k++ ){
+                br.write(words.get(k)+"\n");        
+                
+            }
+            
+            br.close();
+        }
+        catch(Exception e) {
+            System.out.println("Error writing to file");
+        }
+        
+    
+    }
     
     
     public void checkStreak(){
-        if (streak == topStreak){
+            if (streak == topStreak){
                 textTalk.setText("You are just one away from beating the Top 1 player!");
             }
             if (streak > topStreak){
                 textTalk.setText("You are the new Top 1 player!");
+                words.clear();
+                words.add(updateNote.selected.getName());
+                words.add(String.valueOf(streak));
+                topStreak=streak;
+                updateNotePad();
                 // Rewrite the notepad file to this coin flip game and change the Top1 player and highest streak
-                textTopPlayer.setText(playerName);// be able to get the player name 
-                textTopStreak.setText("Streak of"+streak); // some way to keep update this tab and update the topScore if the previous topStreak is gone;
+                textTopPlayer.setText(updateNote.selected.getName());// be able to get the player name 
+                textTopStreak.setText("Streak of"+topStreak); // some way to keep update this tab and update the topScore if the previous topStreak is gone;
                 
             }
     }
-    
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -66,17 +110,20 @@ public class coinToss extends javax.swing.JFrame {
         textTopPlayer = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         textTopStreak = new javax.swing.JTextField();
+        buttonExit = new javax.swing.JButton();
+        textBet = new javax.swing.JTextField();
+        buttonBet = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setText("WELCOME TO THE COIN MASTER");
         jLabel1.setSize(new java.awt.Dimension(45, 20));
 
-        jLabel2.setText("Each toss costs 2 points. ");
+        jLabel2.setText("Bet the amount of points");
 
-        jLabel3.setText("Guessing the correct one gets you 3 points");
+        jLabel3.setText("Guessing the correct one gets you the amount of points you bet");
 
-        jLabel4.setText("Guessing the wrong one will recieve nothing");
+        jLabel4.setText("Guessing the wrong one will remove the amount of points you bet");
 
         buttonHead.setText("HEAD");
         buttonHead.addActionListener(new java.awt.event.ActionListener() {
@@ -89,6 +136,12 @@ public class coinToss extends javax.swing.JFrame {
         buttonTail.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonTailActionPerformed(evt);
+            }
+        });
+
+        textPoints.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textPointsActionPerformed(evt);
             }
         });
 
@@ -121,52 +174,83 @@ public class coinToss extends javax.swing.JFrame {
 
         textTopStreak.setText("Streak of ");
 
+        buttonExit.setText("Exit Game");
+        buttonExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonExitActionPerformed(evt);
+            }
+        });
+
+        textBet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textBetActionPerformed(evt);
+            }
+        });
+
+        buttonBet.setText("Bet");
+        buttonBet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonBetActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(textTalk)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(jLabel6))
+                                .addGap(0, 50, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(buttonHead)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(buttonTail)
-                                .addGap(37, 37, 37)
-                                .addComponent(textStreak, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
+                                .addComponent(buttonTail))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(textTalk)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                        .addGap(0, 0, Short.MAX_VALUE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel6)
-                                        .addGap(0, 131, Short.MAX_VALUE)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))))
+                                .addGap(20, 20, 20)
+                                .addComponent(buttonPlay)))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(buttonBet)
+                                .addGap(49, 49, 49)
+                                .addComponent(jLabel7)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(textBet, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(28, 28, 28)
+                                .addComponent(textStreak, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(26, 26, 26)
-                        .addComponent(buttonPlay)
-                        .addGap(69, 69, 69)
-                        .addComponent(jLabel7)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(textPoints)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(textTopPlayer)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addComponent(jLabel8))
-                    .addComponent(textTopStreak))
-                .addGap(15, 15, 15))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(textPoints)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(textTopPlayer)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(12, 12, 12)
+                                .addComponent(jLabel8))
+                            .addComponent(textTopStreak))
+                        .addGap(15, 15, 15))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(buttonExit)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -192,17 +276,27 @@ public class coinToss extends javax.swing.JFrame {
                     .addComponent(textTopPlayer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(buttonPlay)
-                        .addComponent(jLabel7))
-                    .addComponent(textTopStreak, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(12, 12, 12)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(buttonHead)
-                    .addComponent(buttonTail)
-                    .addComponent(textStreak, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(textTalk, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonPlay)
+                    .addComponent(textTopStreak, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(buttonBet)
+                        .addComponent(jLabel7)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(buttonExit)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(buttonHead)
+                                    .addComponent(buttonTail))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(textStreak, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(textBet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(12, 12, 12)))
+                        .addComponent(textTalk, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -210,12 +304,15 @@ public class coinToss extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonPlayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPlayActionPerformed
-        if(points>=2){
-            buttonHead.setEnabled(true);
-            buttonTail.setEnabled(true);
-            points-=2;
+        loadWords();
+        topUser = words.get(0);
+        topStreak = Integer.parseInt(words.get(1));
+        textTopPlayer.setText(topUser+"");
+        textTopStreak.setText("Streak of "+ topStreak);
+        if(points>0){
+            buttonBet.setEnabled(true);
+            side = (int)(Math.random()*2)+1;
             textTalk.setText("Heads or Tails?");
-            side = (int)(Math.random()*1);
             buttonPlay.setEnabled(false);
         }
         else
@@ -224,41 +321,54 @@ public class coinToss extends javax.swing.JFrame {
 
     private void buttonHeadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonHeadActionPerformed
         if(side == 1){
-            if (streak>=3){
-                points+=5;
-                textTalk.setText("You are on a row!!! Wins 5 points");
+            if (streak>=5){
+                streak++;
+                points+=betPoints*2;
+                textTalk.setText("You are on a row!!! Wins "+betPoints*2+" points");
             }
-            checkStreak();
-            streak++;
-            points+=3;
-            textTalk.setText("It was heads! you won 3 points");
+            else{
+                streak++;
+                points+=betPoints;
+                textTalk.setText("It was heads! you won "+betPoints+" points");
+                checkStreak();
+            }
         }
         else{
             textTalk.setText("Oof wrong side. Wanna play again?");
             streak=0;
+            points-=betPoints;
+            textPoints.setText(points+"");
         }
         textStreak.setText(streak+"");
+        textPoints.setText(points+"");
         buttonHead.setEnabled(false);
+        buttonTail.setEnabled(false);
         buttonPlay.setEnabled(true);
     }//GEN-LAST:event_buttonHeadActionPerformed
 
     private void buttonTailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonTailActionPerformed
-        if(side == 0){
-            if(streak>=3){
-                points+=5;
-                textTalk.setText("You are on a row!!! Wins 5 points");
+        if(side == 2){
+            if(streak>=5){
+                points+=betPoints*2;
+                textTalk.setText("You are on a row!!! Wins "+betPoints*2+" points");
             }
-            checkStreak();
-            points+=3;
-            textTalk.setText("It was tails! You won 3 points");
+            else{
+                points+=betPoints;
+                textTalk.setText("It was tails! You won "+betPoints+" points");
+            }
             streak++;
+            textPoints.setText(points+"");
+            checkStreak();
         }
         else{
             textTalk.setText("Oof wrong side. Wanna play again?");
             streak=0;
+            points-=betPoints;
+            textPoints.setText(points+"");
         }
         textStreak.setText(streak+"");
         buttonTail.setEnabled(false);
+        buttonHead.setEnabled(false);
         buttonPlay.setEnabled(true);
     }//GEN-LAST:event_buttonTailActionPerformed
 
@@ -269,6 +379,37 @@ public class coinToss extends javax.swing.JFrame {
     private void textStreakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textStreakActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_textStreakActionPerformed
+
+    private void textPointsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textPointsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textPointsActionPerformed
+
+    private void buttonExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonExitActionPerformed
+        System.out.println("TOP ONE PRINTING");
+        updateNote.selected.setPoints(points);
+        updateNote.words.set(updateNote.selectedIndex+1, String.valueOf(points));
+        updateNote.updateNotePad();
+        System.out.println("PRint SOMETHIGN");
+        new gameCenter().setVisible(true);
+        coinToss.this.setVisible(false);
+    }//GEN-LAST:event_buttonExitActionPerformed
+
+    private void buttonBetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonBetActionPerformed
+        betPoints = Integer.parseInt(textBet.getText());
+        if(points>=betPoints){
+            buttonBet.setEnabled(false);
+            buttonHead.setEnabled(true);
+            buttonTail.setEnabled(true);
+            textTalk.setText("you bet "+ betPoints);
+            
+        }
+        else
+            textTalk.setText("try something less, you don't have enough");
+    }//GEN-LAST:event_buttonBetActionPerformed
+
+    private void textBetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textBetActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textBetActionPerformed
 
     /**
      * @param args the command line arguments
@@ -283,6 +424,8 @@ public class coinToss extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonBet;
+    private javax.swing.JButton buttonExit;
     private javax.swing.JButton buttonHead;
     private javax.swing.JButton buttonPlay;
     private javax.swing.JButton buttonTail;
@@ -294,6 +437,7 @@ public class coinToss extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JTextField textBet;
     private javax.swing.JTextField textPoints;
     private javax.swing.JTextField textStreak;
     private javax.swing.JTextField textTalk;
